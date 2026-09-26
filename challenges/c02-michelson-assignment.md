@@ -258,13 +258,13 @@ paste("Michelson's Error Estimate:", LIGHTSPEED_PM)
 **Observations**: - Is Michelson’s estimate of the error (his
 uncertainty) greater or less than the true error?
 
-- His estimate of the error was greater than the true error.
+- His true error is greater than his estimate of his error.
 
 Make a quantitative comparison between Michelson’s uncertainty and his
 error.
 
-- Michelson’s uncertainty was about three times greater than the actual
-  error in his measurement.
+- Michelson’s true error was about three times greater than his
+  uncertainty.
 
 The following plot shows all of Michelson’s data as a [control
 chart](https://en.wikipedia.org/wiki/Control_chart); this sort of plot
@@ -420,19 +420,25 @@ df_q2 %>%
     x = Distinctness,
     y = VelocityVacuum
   )) +
-  geom_point()
+  geom_boxplot()
 ```
 
 ![](c02-michelson-assignment_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 Observations:
 
-- It’s odd that the distinctness level 1 measurements are much lower on
-  average than the measurement for distinctness levels 2 and 3. It makes
-  sense to me that the distinctness level 2 images vary more than
-  distinctness level 1, since the images might be harder to make out,
-  leading to more error. I find it odd though that for the level 1
-  images it only shifts downward rather than just varying more.
+- The median velocity increases with the image distinctness. I’m not
+  sure what would be causing this, but I think it would suggest that
+  there is some factor affecting the distinctness that also affects the
+  measured velocity, and it would be worth looking into whether that
+  factor can be controlled better.
+
+Overall, I think the fact that Michelson’s measured speed of light
+varies with both temperature and image distinctness would be good
+factors to investigate and control better if this experiment were
+replicated, and the effects of these variables could help explain some
+of the difference between Michelson’s estimate and the real speed of
+light in a vacuum.
 
 ## Bibliography
 
