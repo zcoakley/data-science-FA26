@@ -1,6 +1,6 @@
 Aluminum Data
 ================
-Zara Coakley
+(Your name here)
 2020-
 
 - [Grading Rubric](#grading-rubric)
@@ -158,7 +158,7 @@ df_stang_long <-
     names_sep = "_"
   ) %>%
   mutate(angle = as.integer(angle)) %>%
-  filter(E != -1, nu != -1)
+  filter(E >= 0, nu >= 0)
 
 df_stang_long
 ```
@@ -277,6 +277,7 @@ unique(df_stang_long$thick)
 
 ``` r
 ## TASK: Investigate your question from q1 here
+
 df_stang_long %>%
   ggplot(mapping = aes(x = factor(angle), y = E)) +
   geom_boxplot()
@@ -290,7 +291,7 @@ df_stang_long %>%
   geom_boxplot()
 ```
 
-![](c03-stang-assignment_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](c03-stang-assignment_files/figure-gfm/q3-task-2.png)<!-- -->
 
 **Observations**:
 
@@ -310,6 +311,11 @@ df_stang_long %>%
   angle continues to have a higher Poisson’s ratio than the 0 and 90
   degree angles after doing that, we could be more confident that that
   is due to an actual property of the aluminum and not just spurious.
+- Overall I do think these graphs provide convincing evidence that the
+  cut angle affects the poisson’s ratio of the metal and it does not
+  affect the stiffness of the metal. More data points would be helpful
+  for more certainty but are not necessary to answer my question from
+  above.
 
 ### **q4** Consider the following statement:
 
