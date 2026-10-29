@@ -12,17 +12,20 @@ prerequisites:
 *Purpose*: In this challenge, you'll learn how to navigate the U.S. Census Bureau website, programmatically download data from the internet, and perform a county-level population-weighted analysis of current COVID-19 trends. This will give you the base for a very deep investigation of COVID-19, which we'll build upon for Project 1.
 
 <!-- include-rubric -->
+
 # Grading Rubric
+
 <!-- -------------------------------------------------- -->
 
 Unlike exercises, **challenges will be graded**. The following rubrics define how you will be graded, both on an individual and team basis.
 
 ## Individual
+
 <!-- ------------------------- -->
 
 | Category | Needs Improvement | Satisfactory |
-|----------|----------------|--------------|
-| Effort | Some task __q__'s left unattempted | All task __q__'s attempted |
+|----|----|----|
+| Effort | Some task **q**'s left unattempted | All task **q**'s attempted |
 | Observed | Did not document observations, or observations incorrect | Documented correct observations based on analysis |
 | Supported | Some observations not clearly supported by analysis | All observations clearly supported by analysis (table, graph, etc.) |
 | Assessed | Observations include claims not supported by the data, or reflect a level of certainty not warranted by the data | Observations are appropriately qualified by the quality & relevance of the data and (in)conclusiveness of the support |
@@ -30,10 +33,10 @@ Unlike exercises, **challenges will be graded**. The following rubrics define ho
 | Code Styled | Violations of the [style guide](https://style.tidyverse.org/) hinder readability | Code sufficiently close to the [style guide](https://style.tidyverse.org/) |
 
 ## Submission
+
 <!-- ------------------------- -->
 
 Make sure to commit both the challenge report (`report.md` file) and supporting files (`report_files/` folder) when you are done! Then submit a link to Canvas. **Your Challenge submission is not complete without all files uploaded to GitHub.**
-
 
 ```{r setup}
 library(tidyverse)
@@ -45,6 +48,7 @@ library(tidyverse)
 *Optional Readings*: I've found this [ProPublica piece](https://www.propublica.org/article/how-to-understand-covid-19-numbers) on "How to understand COVID-19 numbers" to be very informative!
 
 # The Big Picture
+
 <!-- -------------------------------------------------- -->
 
 We're about to go through *a lot* of weird steps, so let's first fix the big picture firmly in mind:
@@ -54,48 +58,54 @@ We want to study COVID-19 in terms of data: both case counts (number of infectio
 That's the high-level view; now let's dig into the details.
 
 # Get the Data
+
 <!-- -------------------------------------------------- -->
 
-1. County-level population estimates (Census Bureau)
-2. County-level COVID-19 counts (New York Times)
+1.  County-level population estimates (Census Bureau)
+2.  County-level COVID-19 counts (New York Times)
 
 ## Navigating the Census Bureau
+
 <!-- ------------------------- -->
 
 **Steps**: Our objective is to find the 2018 American Community Survey[1] (ACS) Total Population estimates, disaggregated by counties. To check your results, this is Table `B01003`.
 
-1. Go to [data.census.gov](data.census.gov).
-2. Scroll down and click `View Tables`.
-3. Apply filters to find the ACS **Total Population** estimates, disaggregated by counties. I used the filters:
-  - `Topics > Populations and People > Counts, Estimates, and Projections > Population Total`
-  - `Geography > County > All counties in United States`
-5. Select the **Total Population** table and click the `Download` button to download the data; make sure to select the 2018 5-year estimates.
-6. Unzip and move the data to your `challenges/data` folder.
-  - Note that the data will have a crazy-long filename like `ACSDT5Y2018.B01003_data_with_overlays_2020-07-26T094857.csv`. That's because metadata is stored in the filename, such as the year of the estimate (`Y2018`) and my access date (`2020-07-26`). **Your filename will vary based on when you download the data**, so make sure to copy the filename that corresponds to what you downloaded!
+1.  Go to [data.census.gov](data.census.gov).
+2.  Scroll down and click `View Tables`.
+3.  Apply filters to find the ACS **Total Population** estimates, disaggregated by counties. I used the filters:
 
-### __q1__ Load Table `B01003` into the following tibble. Make sure the column names are `id, Geographic Area Name, Estimate!!Total, Margin of Error!!Total`.
+- `Topics > Populations and People > Counts, Estimates, and Projections > Population Total`
+- `Geography > County > All counties in United States`
+
+5.  Select the **Total Population** table and click the `Download` button to download the data; make sure to select the 2018 5-year estimates.
+6.  Unzip and move the data to your `challenges/data` folder.
+
+- Note that the data will have a crazy-long filename like `ACSDT5Y2018.B01003_data_with_overlays_2020-07-26T094857.csv`. That's because metadata is stored in the filename, such as the year of the estimate (`Y2018`) and my access date (`2020-07-26`). **Your filename will vary based on when you download the data**, so make sure to copy the filename that corresponds to what you downloaded!
+
+### **q1** Load Table `B01003` into the following tibble. Make sure the column names are `id, Geographic Area Name, Estimate!!Total, Margin of Error!!Total`.
 
 *Hint*: You will need to use the `skip` keyword when loading these data!
 
 ```{r q1-task}
 ## TASK: Load the census bureau data with the following tibble name.
-df_pop <- NA
+df_pop <- read_csv("~/Documents/Data Science/data-science-FA26/challenges/data/ACSDT5Y2018.B01003_2026-10-14T111952/ACSDT5Y2018.B01003-Data.csv", skip = 1)
 ```
 
 *Note*: You can find information on 1-year, 3-year, and 5-year estimates [here](https://www.census.gov/programs-surveys/acs/guidance/estimates.html). The punchline is that 5-year estimates are more reliable but less current.
 
 ## Automated Download of NYT Data
+
 <!-- ------------------------- -->
 
 ACS 5-year estimates don't change all that often, but the COVID-19 data are changing rapidly. To that end, it would be nice to be able to *programmatically* download the most recent data for analysis; that way we can update our analysis whenever we want simply by re-running our notebook. This next problem will have you set up such a pipeline.
 
 The New York Times is publishing up-to-date data on COVID-19 on [GitHub](https://github.com/nytimes/covid-19-data).
 
-### __q2__ Visit the NYT [GitHub](https://github.com/nytimes/covid-19-data) repo and find the URL for the **raw** US County-level data. Assign that URL as a string to the variable below.
+### **q2** Visit the NYT [GitHub](https://github.com/nytimes/covid-19-data) repo and find the URL for the **raw** US County-level data. Assign that URL as a string to the variable below.
 
 ```{r q2-task}
 ## TASK: Find the URL for the NYT covid-19 county-level data
-url_counties <- NA_character_
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
 ```
 
 Once you have the url, the following code will download a local copy of the data, then load the data into R.
@@ -120,6 +130,7 @@ You can now re-run the chunk above (or the entire notebook) to pull the most rec
 *Note*: You should feel free to copy-paste the code above for your own future projects!
 
 # Join the Data
+
 <!-- -------------------------------------------------- -->
 
 To get a sense of our task, let's take a glimpse at our two data sources.
@@ -132,11 +143,12 @@ df_covid %>% glimpse
 
 To join these datasets, we'll need to use [FIPS county codes](https://en.wikipedia.org/wiki/FIPS_county_code).[2] The last `5` digits of the `id` column in `df_pop` is the FIPS county code, while the NYT data `df_covid` already contains the `fips`.
 
-### __q3__ Process the `id` column of `df_pop` to create a `fips` column.
+### **q3** Process the `id` column of `df_pop` to create a `fips` column.
 
 ```{r q3-task}
 ## TASK: Create a `fips` column by extracting the county code
-df_q3 <- NA
+df_q3 <- df_pop %>%
+  mutate(fips = str_sub(Geography, -5))
 ```
 
 Use the following test to check your answer.
@@ -152,11 +164,11 @@ assertthat::assert_that(
 print("Very good!")
 ```
 
-### __q4__ Join `df_covid` with `df_q3` by the `fips` column. Use the proper type of join to preserve *only* the rows in `df_covid`.
+### **q4** Join `df_covid` with `df_q3` by the `fips` column. Use the proper type of join to preserve *only* the rows in `df_covid`.
 
 ```{r q4-task}
 ## TASK: Join df_covid and df_q3 by fips.
-df_q4 <- NA
+df_q4 <- left_join(df_covid, df_q3, "fips")
 ```
 
 Use the following test to check your answer.
@@ -189,8 +201,7 @@ if (any(df_q4 %>% pull(fips) %>% str_detect(., "78010"), na.rm = TRUE)) {
 print("Very good!")
 ```
 
-For convenience, I down-select some columns and produce more convenient column
-names.
+For convenience, I down-select some columns and produce more convenient column names.
 
 ```{r rename}
 ## NOTE: No need to change; run this to produce a more convenient tibble
@@ -208,19 +219,25 @@ df_data <-
 ```
 
 # Analyze
+
 <!-- -------------------------------------------------- -->
 
 Now that we've done the hard work of loading and wrangling the data, we can finally start our analysis. Our first step will be to produce county population-normalized cases and death counts. Then we will explore the data.
 
 ## Normalize
+
 <!-- ------------------------- -->
 
-### __q5__ Use the `population` estimates in `df_data` to normalize `cases` and `deaths` to produce per 100,000 counts [3]. Store these values in the columns `cases_per100k` and `deaths_per100k`.
+### **q5** Use the `population` estimates in `df_data` to normalize `cases` and `deaths` to produce per 100,000 counts [3]. Store these values in the columns `cases_per100k` and `deaths_per100k`.
 
 ```{r q5-task}
 ## TASK: Normalize cases and deaths
 df_normalized <-
-  df_data
+  df_data %>%
+  mutate(
+    cases_per100k = cases / population * 100000,
+    deaths_per100k = deaths / population * 100000
+  )
 ```
 
 You may use the following test to check your work.
@@ -279,45 +296,74 @@ print("Excellent!")
 ```
 
 ## Guided EDA
+
 <!-- ------------------------- -->
 
 Before turning you loose, let's complete a couple guided EDA tasks.
 
-### __q6__ Compute some summaries
+### **q6** Compute some summaries
 
-Compute the mean and standard deviation for `cases_per100k` and `deaths_per100k`. *Make sure to carefully choose __which rows__ to include in your summaries,* and justify why!
+Compute the mean and standard deviation for `cases_per100k` and `deaths_per100k`. *Make sure to carefully choose **which rows** to include in your summaries,* and justify why!
 
 ```{r q6-task}
 ## TASK: Compute mean and sd for cases_per100k and deaths_per100k
+df_normalized %>%
+  summarize(
+    mean_cases = mean(cases_per100k, na.rm = TRUE),
+    sd_cases = sd(cases_per100k, na.rm = TRUE),
+    mean_deaths = mean(deaths_per100k, na.rm = TRUE),
+    sd_deaths = sd(deaths_per100k, na.rm = TRUE)
+  )
 ```
 
 - Which rows did you pick?
-  - (Your response here)
+  - For each calculation, I removed any rows where that particular statistic was NA. I removed them inside the mean/sd calculation rather than as a filter() beforehand so that I could preserve any rows that have a value for the case count per 100k but NA for the death count per 100k, or vice versa.
 - Why?
-  - (Your response here)
+  - The NA values need to be removed in order for the mean and standard deviation calculations to work. However, I didn't fully delete the rows that have NA for case or death count per 100k because they still contain information, even if it's incomplete.
 
-### __q7__ Find and compare the top 10
+### **q7** Find and compare the top 10
 
 Find the top 10 counties in terms of `cases_per100k`, and the top 10 in terms of `deaths_per100k`. Report the population of each county along with the per-100,000 counts. Compare the counts against the mean values you found in q6. Note any observations.
 
 ```{r q7-task}
 ## TASK: Find the top 10 max cases_per100k counties; report populations as well
+df_normalized %>%
+  group_by(fips) %>%
+  filter(cases_per100k == max(cases_per100k, na.rm = TRUE)) %>%
+  filter(date == min(date), na.rm = TRUE) %>%
+  ungroup() %>%
+  arrange(desc(cases_per100k)) %>%
+  select(state, county, cases_per100k, population, date) %>%
+  head(10)
 
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
+df_normalized %>%
+  group_by(fips) %>%
+  filter(deaths_per100k == max(deaths_per100k, na.rm = TRUE)) %>%
+  filter(date == min(date), na.rm = TRUE) %>%
+  ungroup() %>%
+  arrange(desc(deaths_per100k)) %>%
+  select(state, county, deaths_per100k, population, date) %>%
+  head(10)
 ```
 
 **Observations**:
 
-- (Note your observations here!)
+- I notice that the counties appearing at the top of both of these lists have pretty low populations. From a quick web search, an average county in the US has around 50,000 residents, while the counties with the most case and death counts per 100k people have populations ranging from 102-18,040.
+- A single outbreak in a county with a small population can bring its case/death rate up very high. I wonder if this statistic is better used for larger groups of people, like a whole state or group of counties.
+- It feels a little silly to be reporting cases and deaths per 100k in counties where there are only a few thousand people. But maybe this underscores the point that this statistic can be very variable for a group that is too small.
+- The case and death counts per 100k for these counties are much higher than the mean case and death count per 100k values. This makes sense since we are purposely finding the highest values in the dataset.
 - When did these "largest values" occur?
-  - (Your response here)
+  - All of these largest values occur in the first half of 2022. I believe the case and death counts are cumulative, so it makes sense that the highest counts would be toward the end of the data collection period. The dataset's latest date is 2022-05-13.
 
 ## Self-directed EDA
+
 <!-- ------------------------- -->
 
-### __q8__ Drive your own ship: You've just put together a very rich dataset; you now get to explore! Pick your own direction and generate at least one punchline figure to document an interesting finding. I give a couple tips & ideas below:
+### **q8** Drive your own ship: You've just put together a very rich dataset; you now get to explore! Pick your own direction and generate at least one punchline figure to document an interesting finding. I give a couple tips & ideas below:
 
 ### Ideas
+
 <!-- ------------------------- -->
 
 - Look for outliers.
@@ -327,9 +373,54 @@ Find the top 10 counties in terms of `cases_per100k`, and the top 10 in terms of
 - Fix the *geographic exceptions* noted below to study New York City.
 - Your own idea!
 
-**DO YOUR OWN ANALYSIS HERE**
+I am looking into Hennepin County, Minnesota (where I'm from) and looking to answer the question: How did the spread of Covid in Hennepin county compare to the way it spread in other Minnesota counties?
+
+Hennepin county contains Minneapolis and is by far the most populous county in Minnesota, as seen below. (the graph can be read more clearly if you expand it to full screen)
+
+```{r}
+df_normalized %>%
+  filter(state == "Minnesota" & county != "Unknown") %>%
+  ggplot(aes(y = population, x = reorder(county, population))) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+I plotted the cases per 100k people over time in Hennepin and the rest of the Minnesota counties and noticed some interesting results.
+
+```{r}
+df_normalized %>%
+  filter(
+    state == "Minnesota",
+    !is.na(fips)
+  ) %>%
+  ggplot(aes(date, cases_per100k)) +
+  geom_line(
+    aes(group = county),
+    color = "gray"
+  ) +
+  geom_line(
+    data = . %>% filter(county == "Hennepin"),
+    aes(color = "Hennepin County")
+  ) +
+  scale_color_manual(
+    name = "County",
+    values = c("Hennepin County" = "blue")
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Date",
+    y = "Cases (per 100,000 persons)"
+  )
+```
+
+In the first year or so of the pandemic, Hennepin county is one of the leading counties in Minnesota in terms of cases per 100k people (you can see on the graph that most of the shaded gray is below the blue line representing Hennepin county). However, in the data for the next two years Hennepin county has relatively low cases per 100k compared to the other counties.
+
+My guess for why this is is that Covid spread in Minneapolis first, and then took time to spread to other places in Minnesota. Minneapolis is a major national and international travel hub, so it would not be surprising if it was the first place that Covid appeared in Minnesota. Once the virus made its way to other counties and was established there, Minneapolis was not such an outlier because the virus was everywhere.
+
+I was expecting going into this analysis that Minneapolis would have a much higher number of cases per 100k people than the other counties because people live in much closer proximity, but it seems that that is not the case. Maybe living in the city doesn't affect the rate of disease spread as much as I thought.
 
 ### Aside: Some visualization tricks
+
 <!-- ------------------------- -->
 
 These data get a little busy, so it's helpful to know a few `ggplot` tricks to help with the visualization. Here's an example focused on Massachusetts.
@@ -346,7 +437,7 @@ df_normalized %>%
     aes(date, cases_per100k, color = fct_reorder2(county, date, cases_per100k))
   ) +
   geom_line() +
-  scale_y_log10(labels = scales::label_number_si()) +
+  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
   scale_color_discrete(name = "County") +
   theme_minimal() +
   labs(
@@ -364,13 +455,13 @@ df_normalized %>%
 - I use `labs()` to give manual labels.
 
 ### Geographic exceptions
+
 <!-- ------------------------- -->
 
 The NYT repo documents some [geographic exceptions](https://github.com/nytimes/covid-19-data#geographic-exceptions); the data for New York, Kings, Queens, Bronx and Richmond counties are consolidated under "New York City" *without* a fips code. Thus the normalized counts in `df_normalized` are `NA`. To fix this, you would need to merge the population data from the New York City counties, and manually normalize the data.
 
-
-
 # Notes
+
 <!-- -------------------------------------------------- -->
 
 [1] The census used to have many, many questions, but the ACS was created in 2010 to remove some questions and shorten the census. You can learn more in [this wonderful visual history](https://pudding.cool/2020/03/census-history/) of the census.
