@@ -157,6 +157,7 @@ is Gram positive or negative.
 
 ``` r
 # WRITE YOUR CODE HERE
+library(tidytext)
 
 df_antibiotics %>%
   pivot_longer(
@@ -164,15 +165,21 @@ df_antibiotics %>%
     names_to = "antibiotic",
     values_to = "value"
   ) %>%
-  ggplot(aes(x = antibiotic, y = value, fill = gram)) +
+  mutate(
+    bacteria = reorder_within(bacteria, value, antibiotic)
+  ) %>%
+  ggplot(aes(x = bacteria, y = value, fill = gram)) +
   geom_col() +
-  facet_wrap(vars(bacteria), scales = "free_y") +
+  facet_wrap(~antibiotic, scales = "free_x") +
+  scale_x_reordered() +
   theme(
     axis.text.x = element_text(
       angle = 45,
       hjust = 1
     )
-  )
+  ) +
+  scale_y_log10() +
+  geom_hline(yintercept = 0.1)
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.1-1.png)<!-- -->
@@ -196,8 +203,9 @@ df_antibiotics %>%
     names_to = "antibiotic",
     values_to = "value"
   ) %>%
-  ggplot(aes(x = bacteria, y = value, fill = antibiotic, color = gram)) +
+  ggplot(aes(x = reorder(bacteria, value), y = value, fill = antibiotic, color = gram)) +
   geom_col(position = "dodge") +
+  scale_color_manual(values = c("negative" = "black", "positive" = "white")) +
   theme(
     axis.text.x = element_text(
       angle = 45,
@@ -325,12 +333,13 @@ opportunity to think about why this is.**
   effectiveness against it.
 
 - From visual 3, neomycin appears to be especially effective against the
-  stapylococcus genus and ineffective against streptococcus. Penicillin
-  is especially effective against stapylococcus and streptococcus (and
-  bacillus potentially, but there is only one data point for that
-  genus), and it is ineffective against several different genii.
-  Streptomycin is effective against bacillus (again just one data point)
-  and ineffective against streptococcus.
+  stapylococcus genus (effective against 2/2 strains) and ineffective
+  against streptococcus (effective against 1/3 strains). Penicillin is
+  especially effective against stapylococcus (2/2 strains) and
+  streptococcus (2/3 strains) (and bacillus potentially, but there is
+  only one data point for that genus), and it is ineffective against
+  several different genii. Streptomycin is effective against bacillus
+  (again just one data point) and ineffective against streptococcus.
 
 Which of your visuals above (1 through 5) is **most effective** at
 helping to answer this question? Why?
