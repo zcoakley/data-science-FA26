@@ -1,7 +1,7 @@
 Antibiotics
 ================
-(Your name here)
-2020-
+Zara Coakley
+October 2026
 
 *Purpose*: Creating effective data visualizations is an *iterative*
 process; very rarely will the first graph you make be the most
