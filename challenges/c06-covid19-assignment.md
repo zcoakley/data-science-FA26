@@ -1,7 +1,7 @@
 COVID-19
 ================
-(Your name here)
-2020-
+Zara Coakley
+2026-10-15
 
 - [Grading Rubric](#grading-rubric)
   - [Individual](#individual)
@@ -165,18 +165,30 @@ To check your results, this is Table `B01003`.
 
 ``` r
 ## TASK: Load the census bureau data with the following tibble name.
-df_pop <- read_csv("~/Documents/Data Science/data-science-FA26/challenges/data/ACSDT5Y2018.B01003_2026-10-14T111952/ACSDT5Y2018.B01003-Data.csv", skip = 1)
+# df_pop <- read_csv("~/Documents/Data Science/data-science-FA26/challenges/data/ACSDT5Y2018.B01003_2026-10-14T111952/ACSDT5Y2018.B01003-Data.csv", skip = 1)
+
+df_pop <-
+  read_csv(
+    "~/Documents/Data Science/data-science-FA26/challenges/data/ACSDT5Y2018.B01003_2026-10-14T111952/ACSDT5Y2018.B01003-Data.csv",
+    col_names = c(
+      "Geography",
+      "Geographic Area Name",
+      "Estimate!!Total",
+      "Margin of Error!!Total"
+    ),
+    skip = 2
+  )
 ```
 
-    ## New names:
     ## Rows: 3220 Columns: 5
-    ## ── Column specification
-    ## ──────────────────────────────────────────────────────── Delimiter: "," chr
-    ## (3): Geography, Geographic Area Name, Margin of Error!!Total dbl (1):
-    ## Estimate!!Total lgl (1): ...5
-    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
-    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
-    ## • `` -> `...5`
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): Geography, Geographic Area Name, Margin of Error!!Total
+    ## dbl (1): Estimate!!Total
+    ## lgl (1): X5
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 *Note*: You can find information on 1-year, 3-year, and 5-year estimates
 [here](https://www.census.gov/programs-surveys/acs/guidance/estimates.html).
@@ -256,7 +268,7 @@ df_pop %>% glimpse
     ## $ `Geographic Area Name`   <chr> "Autauga County, Alabama", "Baldwin County, A…
     ## $ `Estimate!!Total`        <dbl> 55200, 208107, 25782, 22527, 57645, 10352, 20…
     ## $ `Margin of Error!!Total` <chr> "*****", "*****", "*****", "*****", "*****", …
-    ## $ ...5                     <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+    ## $ X5                       <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
 
 ``` r
 df_covid %>% glimpse
@@ -280,8 +292,11 @@ the NYT data `df_covid` already contains the `fips`.
 
 ``` r
 ## TASK: Create a `fips` column by extracting the county code
-df_q3 <- df_pop %>%
-  mutate(fips = str_sub(Geography, -5))
+df_q3 <-
+  df_pop %>%
+  mutate(
+    fips = str_sub(Geography, -5)
+    )
 ```
 
 Use the following test to check your answer.
@@ -308,7 +323,8 @@ print("Very good!")
 
 ``` r
 ## TASK: Join df_covid and df_q3 by fips.
-df_q4 <- left_join(df_covid, df_q3, "fips")
+df_q4 <- 
+  left_join(df_covid, df_q3, "fips")
 ```
 
 Use the following test to check your answer.
@@ -506,6 +522,9 @@ include in your summaries,* and justify why!
 ``` r
 ## TASK: Compute mean and sd for cases_per100k and deaths_per100k
 df_normalized %>%
+  filter(
+    date == as.Date("2022-01-23")
+  ) %>%
   summarize(
     mean_cases = mean(cases_per100k, na.rm = TRUE),
     sd_cases = sd(cases_per100k, na.rm = TRUE),
@@ -517,19 +536,18 @@ df_normalized %>%
     ## # A tibble: 1 × 4
     ##   mean_cases sd_cases mean_deaths sd_deaths
     ##        <dbl>    <dbl>       <dbl>     <dbl>
-    ## 1      9975.    8449.        174.      159.
+    ## 1     20995.    4794.        321.      143.
 
 - Which rows did you pick?
-  - For each calculation, I removed any rows where that particular
-    statistic was NA. I removed them inside the mean/sd calculation
-    rather than as a filter() beforehand so that I could preserve any
-    rows that have a value for the case count per 100k but NA for the
-    death count per 100k, or vice versa.
+  - I calculated the mean and standard deviation of cases and deaths per
+    100k across all counties for a single day: January 23, 2022. There
+    was not a particular reason for choosing this day.
 - Why?
-  - The NA values need to be removed in order for the mean and standard
-    deviation calculations to work. However, I didn’t fully delete the
-    rows that have NA for case or death count per 100k because they
-    still contain information, even if it’s incomplete.
+  - Calculating the mean and standard deviation of cases and deaths per
+    100k across all dates and all counties in the dataset doesn’t
+    produce a very interpretable value. It will be easier to
+    conceptualize the mean and standard deviation of cases and death per
+    100k across all counties just for a single day.
 
 ### **q7** Find and compare the top 10
 
@@ -541,78 +559,56 @@ you found in q6. Note any observations.
 ``` r
 ## TASK: Find the top 10 max cases_per100k counties; report populations as well
 df_normalized %>%
-  group_by(fips) %>%
-  filter(cases_per100k == max(cases_per100k, na.rm = TRUE)) %>%
-  filter(date == min(date), na.rm = TRUE) %>%
-  ungroup() %>%
+  filter(date == as.Date("2022-01-23")) %>%
   arrange(desc(cases_per100k)) %>%
   select(state, county, cases_per100k, population, date) %>%
   head(10)
 ```
 
-    ## Warning: There were 10 warnings in `filter()`.
-    ## The first warning was:
-    ## ℹ In argument: `cases_per100k == max(cases_per100k, na.rm = TRUE)`.
-    ## ℹ In group 93: `fips = "02997"`.
-    ## Caused by warning in `max()`:
-    ## ! no non-missing arguments to max; returning -Inf
-    ## ℹ Run `dplyr::last_dplyr_warnings()` to see the 9 remaining warnings.
-
     ## # A tibble: 10 × 5
     ##    state        county                   cases_per100k population date      
     ##    <chr>        <chr>                            <dbl>      <dbl> <date>    
-    ##  1 Texas        Loving                         192157.        102 2022-05-12
-    ##  2 Georgia      Chattahoochee                   69527.      10767 2022-05-11
-    ##  3 Alaska       Nome Census Area                62922.       9925 2022-05-11
-    ##  4 Alaska       Northwest Arctic Borough        62542.       7734 2022-05-11
-    ##  5 Colorado     Crowley                         59449.       5630 2022-05-13
-    ##  6 Alaska       Bethel Census Area              57439.      18040 2022-05-11
-    ##  7 South Dakota Dewey                           54317.       5779 2022-03-30
-    ##  8 Texas        Dimmit                          54019.      10663 2022-05-12
-    ##  9 Texas        Jim Hogg                        50133.       5282 2022-05-12
-    ## 10 Alaska       Kusilvak Census Area            49817.       8198 2022-05-11
+    ##  1 Texas        Loving                          83333.        102 2022-01-23
+    ##  2 Georgia      Chattahoochee                   60964.      10767 2022-01-23
+    ##  3 Colorado     Crowley                         48686.       5630 2022-01-23
+    ##  4 Texas        Dimmit                          46994.      10663 2022-01-23
+    ##  5 Alaska       Bethel Census Area              42295.      18040 2022-01-23
+    ##  6 South Dakota Dewey                           40630.       5779 2022-01-23
+    ##  7 Florida      Miami-Dade                      40452.    2715516 2022-01-23
+    ##  8 Wyoming      Teton                           38224.      23059 2022-01-23
+    ##  9 Tennessee    Trousdale                       37940.       9573 2022-01-23
+    ## 10 Alaska       Northwest Arctic Borough        37096.       7734 2022-01-23
 
 ``` r
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
 df_normalized %>%
-  group_by(fips) %>%
-  filter(deaths_per100k == max(deaths_per100k, na.rm = TRUE)) %>%
-  filter(date == min(date), na.rm = TRUE) %>%
-  ungroup() %>%
+  filter(date == as.Date("2022-01-23")) %>%
   arrange(desc(deaths_per100k)) %>%
   select(state, county, deaths_per100k, population, date) %>%
   head(10)
 ```
 
-    ## Warning: There were 88 warnings in `filter()`.
-    ## The first warning was:
-    ## ℹ In argument: `deaths_per100k == max(deaths_per100k, na.rm = TRUE)`.
-    ## ℹ In group 93: `fips = "02997"`.
-    ## Caused by warning in `max()`:
-    ## ! no non-missing arguments to max; returning -Inf
-    ## ℹ Run `dplyr::last_dplyr_warnings()` to see the 87 remaining warnings.
-
     ## # A tibble: 10 × 5
-    ##    state        county            deaths_per100k population date      
-    ##    <chr>        <chr>                      <dbl>      <dbl> <date>    
-    ##  1 Texas        McMullen                   1360.        662 2022-02-19
-    ##  2 Virginia     Galax city                 1175.       6638 2022-04-27
-    ##  3 Texas        Motley                     1125.       1156 2022-03-10
-    ##  4 Georgia      Hancock                    1054.       8535 2022-04-20
-    ##  5 Virginia     Emporia city               1022.       5381 2022-04-19
-    ##  6 Georgia      Towns                      1016.      11417 2022-04-27
-    ##  7 South Dakota Jerauld                     986.       2029 2022-02-14
-    ##  8 Texas        Loving                      980.        102 2022-03-04
-    ##  9 Kentucky     Robertson                   980.       2143 2022-02-03
-    ## 10 Virginia     Martinsville city           946.      13101 2022-05-05
+    ##    state        county       deaths_per100k population date      
+    ##    <chr>        <chr>                 <dbl>      <dbl> <date>    
+    ##  1 Texas        McMullen              1208.        662 2022-01-23
+    ##  2 Virginia     Galax city            1070.       6638 2022-01-23
+    ##  3 Georgia      Hancock                984.       8535 2022-01-23
+    ##  4 South Dakota Jerauld                936.       2029 2022-01-23
+    ##  5 Kentucky     Robertson              887.       2143 2022-01-23
+    ##  6 Kansas       Gove                   878.       2619 2022-01-23
+    ##  7 New Mexico   Harding                871.        459 2022-01-23
+    ##  8 Texas        Motley                 865.       1156 2022-01-23
+    ##  9 Virginia     Emporia city           855.       5381 2022-01-23
+    ## 10 Georgia      Candler                840.      10827 2022-01-23
 
 **Observations**:
 
 - I notice that the counties appearing at the top of both of these lists
   have pretty low populations. From a quick web search, an average
-  county in the US has around 50,000 residents, while the counties with
-  the most case and death counts per 100k people have populations
-  ranging from 102-18,040.
+  county in the US has around 50,000 residents, while out of the 20
+  counties at the top of these lists, only one county has more than
+  50,000 people and mostly have significantly less.
 - A single outbreak in a county with a small population can bring its
   case/death rate up very high. I wonder if this statistic is better
   used for larger groups of people, like a whole state or group of
@@ -625,10 +621,8 @@ df_normalized %>%
   than the mean case and death count per 100k values. This makes sense
   since we are purposely finding the highest values in the dataset.
 - When did these “largest values” occur?
-  - All of these largest values occur in the first half of 2022. I
-    believe the case and death counts are cumulative, so it makes sense
-    that the highest counts would be toward the end of the data
-    collection period. The dataset’s latest date is 2022-05-13.
+  - They all occurred on January 23, 2022 because that is the date I
+    filtered the dataset down to in q6.
 
 ## Self-directed EDA
 
@@ -653,15 +647,18 @@ looking to answer the question: How did the spread of Covid in Hennepin
 county compare to the way it spread in other Minnesota counties?
 
 Hennepin county contains Minneapolis and is by far the most populous
-county in Minnesota, as seen below. (the graph can be read more clearly
-if you expand it to full screen)
+county in Minnesota, as seen in the graph below, which shows the top 20
+most populous counties in Minnesota.
 
 ``` r
 df_normalized %>%
   filter(state == "Minnesota" & county != "Unknown") %>%
-  ggplot(aes(y = population, x = reorder(county, population))) +
+  distinct(county, population) %>%
+  slice_max(population, n = 20) %>%
+  ggplot(aes(y = reorder(county, population), x = population)) +
   geom_col() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  ylab("county") +
+  scale_x_continuous(labels = scales::label_number())
 ```
 
 ![](c06-covid19-assignment_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
